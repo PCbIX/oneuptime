@@ -77,8 +77,21 @@ export default class ObjectID extends DatabaseProperty {
 
   protected static override toDatabase(
     value: ObjectID | FindOperator<ObjectID>,
-  ): string | null {
+  ): string | FindOperator<ObjectID> | null {
     if (value) {
+      if (value instanceof FindOperator) {
+        value.transformValue({
+          to: (operatorValue: any): any => {
+            return ObjectID.toDatabase(operatorValue as ObjectID);
+          },
+          from: (operatorValue: any): any => {
+            return operatorValue;
+          },
+        });
+
+        return value;
+      }
+
       if (typeof value === "string") {
         value = new ObjectID(value);
       }

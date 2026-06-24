@@ -1,6 +1,6 @@
 {
   "name": "mobileapp",
-  "version": "11.0.12",
+  "version": "11.0.12-objectid-hotfix",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",

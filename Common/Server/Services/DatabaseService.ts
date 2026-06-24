@@ -1589,6 +1589,8 @@ class DatabaseService<TBaseModel extends BaseModel> extends BaseService {
 
       onBeforeFind.query = result.query;
       onBeforeFind.select = result.select || undefined;
+      const automaticallySelectedSortColumns: Array<string> =
+        this.addSortColumnsToSelect(onBeforeFind);
 
       if (!(onBeforeFind.skip instanceof PositiveNumber)) {
         onBeforeFind.skip = new PositiveNumber(onBeforeFind.skip);
@@ -1627,6 +1629,10 @@ class DatabaseService<TBaseModel extends BaseModel> extends BaseService {
         if (automaticallyAddedCreatedAtInSelect) {
           delete (item as any).createdAt;
         }
+
+        for (const column of automaticallySelectedSortColumns) {
+          delete (item as any)[column];
+        }
       }
 
       if (!findBy.props.ignoreHooks) {
@@ -1640,6 +1646,30 @@ class DatabaseService<TBaseModel extends BaseModel> extends BaseService {
       await this.onFindError(error as Exception);
       throw this.getException(error as Exception);
     }
+  }
+
+  private addSortColumnsToSelect(findBy: FindBy<TBaseModel>): Array<string> {
+    const automaticallySelectedSortColumns: Array<string> = [];
+
+    if (!findBy.select || !findBy.sort) {
+      return automaticallySelectedSortColumns;
+    }
+
+    for (const column in findBy.sort) {
+      if (
+        !findBy.sort[column] ||
+        typeof findBy.sort[column] === Typeof.Object
+      ) {
+        continue;
+      }
+
+      if (!(findBy.select as any)[column]) {
+        (findBy.select as any)[column] = true;
+        automaticallySelectedSortColumns.push(column);
+      }
+    }
+
+    return automaticallySelectedSortColumns;
   }
 
   private sanitizeFindByItems(

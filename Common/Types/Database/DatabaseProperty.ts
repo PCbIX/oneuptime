@@ -21,7 +21,13 @@ export default class DatabaseProperty extends SerializableObject {
       | DatabaseProperty
       | Array<DatabaseProperty>
       | FindOperator<DatabaseProperty>,
-  ): string | number | JSONObject | JSONArray | null {
+  ):
+    | string
+    | number
+    | JSONObject
+    | JSONArray
+    | FindOperator<DatabaseProperty>
+    | null {
     throw new NotImplementedException();
   }
 
@@ -33,7 +39,13 @@ export default class DatabaseProperty extends SerializableObject {
 
   protected static _toDatabase(
     value: DatabaseProperty | FindOperator<DatabaseProperty>,
-  ): string | number | JSONObject | JSONArray | null {
+  ):
+    | string
+    | number
+    | JSONObject
+    | JSONArray
+    | FindOperator<DatabaseProperty>
+    | null {
     // if its a RAW query. Return a raw query.
     if (value && (value as any)._type === "raw") {
       return value as any;

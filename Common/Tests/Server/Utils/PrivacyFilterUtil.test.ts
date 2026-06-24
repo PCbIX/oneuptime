@@ -38,6 +38,21 @@ describe("combineWithPrivacyClause", () => {
     expect(children[1]).toBe(clause);
   });
 
+  it("keeps nested ObjectID FindOperator values as UUID strings after database transformation", () => {
+    const incidentId: ObjectID = ObjectID.generate();
+    const clause: FindOperatorType = makePrivacyClause();
+    const combined: any = combineWithPrivacyClause(incidentId, clause as any);
+
+    const transformed: any = ObjectID.getDatabaseTransformer().to(combined);
+
+    expect(transformed).toBeInstanceOf(FindOperator);
+    expect(transformed.type).toBe("and");
+    expect(transformed.value[0].type).toBe("equal");
+    expect(transformed.value[0].value).toBe(incidentId.toString());
+    expect(transformed.value[0].value).not.toBe("[object Object]");
+    expect(transformed.value[1]).toBe(clause);
+  });
+
   it("ANDs an existing string equality with the privacy clause", () => {
     const clause: FindOperatorType = makePrivacyClause();
     const combined: any = combineWithPrivacyClause("some-id", clause as any);
